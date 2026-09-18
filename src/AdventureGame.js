@@ -282,6 +282,7 @@ function showHelp() {
   console.log("- Defeat monsters to earn gold");
   console.log("- Health can't go above 100");
 }
+
 //====================================
 // ---------- Main game loop ----------
 //Controlsthe flow of the game
