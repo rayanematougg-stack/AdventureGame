@@ -12,9 +12,6 @@ let playerHealth = 100;
 let playerGold = 20;
 let currentLocation = "village";
 let gameRunning = true;
-let hasWeapon = false;
-let hasPotion = false;
-let hasArmor = false;
 let isFirstVisit = true;
 
 // Weapon damage-Combat-related values
@@ -26,15 +23,15 @@ let healingPotionValue = 30;
 // START Lab: Inventory System
 // =========================================
 const healthPotion = {
-  Name: "Health Potion",
-  Type: "potion",
-  Value: 5,
+  name: "Health Potion",
+  type: "potion",
+  value: 5,
   effect: 30,
   description: "Restor 30 health points ",
 };
 const sword = {
-  Name: "sword",
-  Type: "weapon",
+  name: "sword",
+  type: "weapon",
   value: 10,
   effect: 10,
   description: "A sturdy blade for combat ",
@@ -65,7 +62,7 @@ function showStatus() {
     console.log("Nothing in inventory");
   } else {
     inventory.forEach((item, index) => {
-      console.log("" + (index + 1) + "." + item);
+      console.log("" + (index + 1) + "." + item.Name);
     });
   }
 }
@@ -165,9 +162,11 @@ function move(playerChoiceNum) {
       validMove = true;
     }
   } else if (currentLocation === "market") {
-    currentLocation === "village";
-    console.log("\nYou return to the village");
-    validMove = true;
+    if (playerChoiceNum === 2) {
+      currentLocation = "village";
+      console.log("\nYou return to the village");
+      validMove = true;
+    }
   } else if (currentLocation === "forest") {
     if (playerChoiceNum === 1) {
       currentLocation = "village";
@@ -286,11 +285,13 @@ function checkInventory() {
  *Handles purchasing items at the blacksmit
  */
 function buyFromBlacksmith() {
-  if (playerGold >= 10) {
+  if (playerGold >= sword.value) {
     console.log("\nBlacksmith : 'A fine blade for a brave adventurer !' ");
-    playerGold -= 10;
-    inventory.push("sword");
-    console.log("You bought a sword for 10 gold!");
+    playerGold -= sword.value;
+    inventory.push({ ...sword });
+    console.log(
+      "You bought a " + sword.name + " for " + sword.value + " gold!",
+    );
     console.log("Gold Remaining " + playerGold);
   } else {
     console.log("\nBlacksmith : 'come back when you have more gold ! ' ");
@@ -299,11 +300,17 @@ function buyFromBlacksmith() {
  * Handle buy from market
  */
 function buyFromMarket() {
-  if (playerGold >= 5) {
+  if (playerGold >= healthPotion.value) {
     console.log("\nMerchant : 'This portion will heal your wounds !'");
-    playerGold -= 5;
+    playerGold -= healthPotion.value;
     inventory.push("potion");
-    console.log("You bought a health potion for 5 gold");
+    console.log(
+      "You bought a " +
+        healthPotion.name +
+        " for " +
+        healthPotion.value +
+        " gold!",
+    );
     console.log("Gold remaining : " + playerGold);
   } else {
     console.log("\nMerchant:'No gold , no potion !'");
