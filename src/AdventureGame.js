@@ -27,14 +27,14 @@ const healthPotion = {
   type: "potion",
   value: 5,
   effect: 30,
-  description: "Restor 30 health points ",
+  description: "Restore 30 health points",
 };
 const sword = {
-  name: "sword",
+  name: "Sword",
   type: "weapon",
   value: 10,
   effect: 10,
-  description: "A sturdy blade for combat ",
+  description: "A sturdy blade for combat",
 };
 const steelSword = {
   name: "Steel Sword",
@@ -116,12 +116,13 @@ function showLocation() {
       "The heat from the forge fills the air. Weapons and armor line the walls.",
     );
     console.log("\nWhat would you like to do?");
-    console.log("1:Buy sword (" + sword.value + "gold)");
-    console.log("2: Return to village");
-    console.log("3: Check status");
-    console.log("4: Use Item");
-    console.log("5: Help");
-    console.log("6: Quit Game");
+    console.log("1: Buy Sword (" + sword.value + " gold)");
+    console.log("2: Buy Steel Sword (" + steelSword.value + " gold)");
+    console.log("3: Return to village");
+    console.log("4: Check status");
+    console.log("5: Use Item");
+    console.log("6: Help");
+    console.log("7: Quit Game");
   } else if (currentLocation === "market") {
     console.log(
       "Merchants sell their wares from colorful stalls. A potion seller catches your eye.",
@@ -135,7 +136,7 @@ function showLocation() {
     console.log("6: Quit Game");
   } else if (currentLocation === "forest") {
     console.log(
-      "The forest is dark and foreboding. You hear starange noises all around you. ",
+      "The forest is dark and foreboding. You hear strange noises all around you. ",
     );
     console.log("\nWhat would you like to do?");
     console.log("1: Return to village");
@@ -159,7 +160,7 @@ function move(playerChoiceNum) {
   if (currentLocation === "village") {
     if (playerChoiceNum === 1) {
       currentLocation = "blacksmith";
-      console.log("\nTou enter the blacksmith's shop");
+      console.log("\nYou enter the blacksmith's shop");
       validMove = true;
     } else if (playerChoiceNum === 2) {
       currentLocation = "market";
@@ -183,13 +184,13 @@ function move(playerChoiceNum) {
       } else {
         console.log("\nYou entered the forest...");
         console.log("\nA monster appears!");
-        if (!handlCombat()) {
+        if (!handlCombat(false)) {
           currentLocation = "village";
         }
       }
     }
   } else if (currentLocation === "blacksmith") {
-    if (playerChoiceNum === 2) {
+    if (playerChoiceNum === 3) {
       currentLocation = "village";
       console.log("\nYou enter the village");
       validMove = true;
@@ -388,19 +389,22 @@ function checkInventory() {
 /**
  *Handles purchasing items at the blacksmit
  */
-function buyFromBlacksmith() {
-  if (playerGold >= sword.value) {
+function buyFromBlacksmith(weaponType) {
+  let itemToBuy = weaponType === "steel" ? steelSword : sword;
+
+  if (playerGold >= itemToBuy.value) {
     console.log("\nBlacksmith : 'A fine blade for a brave adventurer !' ");
-    playerGold -= sword.value;
-    inventory.push({ ...sword });
+    playerGold -= itemToBuy.value;
+    inventory.push({ ...itemToBuy });
     console.log(
-      "You bought a " + sword.name + " for " + sword.value + " gold!",
+      "You bought a " + itemToBuy.name + " for " + itemToBuy.value + " gold!",
     );
     console.log("Gold Remaining " + playerGold);
   } else {
     console.log("\nBlacksmith : 'come back when you have more gold ! ' ");
   }
-} /**
+}
+/**
  * Handle buy from market
  */
 function buyFromMarket() {
@@ -556,23 +560,25 @@ while (gameRunning) {
           console.log("\nThanks for playing!");
         }
       } else if (currentLocation === "blacksmith") {
-        if (playerChoiceNum < 1 || playerChoiceNum > 6) {
-          throw "Please enter a number between 1 and 6.";
+        if (playerChoiceNum < 1 || playerChoiceNum > 7) {
+          throw "Please enter a number between 1 and 7.";
         }
 
         validChoice = true;
 
         if (playerChoiceNum === 1) {
-          buyFromBlacksmith();
+          buyFromBlacksmith("sword");
         } else if (playerChoiceNum === 2) {
-          move(playerChoiceNum);
+          buyFromBlacksmith("steel");
         } else if (playerChoiceNum === 3) {
-          showStatus();
+          move(playerChoiceNum);
         } else if (playerChoiceNum === 4) {
-          useItem();
+          showStatus();
         } else if (playerChoiceNum === 5) {
-          showHelp();
+          useItem();
         } else if (playerChoiceNum === 6) {
+          showHelp();
+        } else if (playerChoiceNum === 7) {
           gameRunning = false;
           console.log("\nThanks for playing!");
         }
@@ -605,7 +611,7 @@ while (gameRunning) {
         validChoice = true;
 
         if (playerChoiceNum === 1) {
-          move(choiceNum);
+          move(playerChoiceNum); // FIXED: Changed choiceNum to playerChoiceNum
         } else if (playerChoiceNum === 2) {
           showStatus();
         } else if (playerChoiceNum === 3) {
