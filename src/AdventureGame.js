@@ -432,6 +432,11 @@ function hasGoodEquipment() {
   let hasSteelSword = bestWeapon !== null && bestWeapon.name === "Steel Sword";
   return hasSteelSword && hasArmorPiece;
 }
+function isValidChoice(playerChoiceNum, min, max) {
+  return (
+    !isNaN(playerChoiceNum) && playerChoiceNum >= min && playerChoiceNum <= max
+  );
+}
 
 //====================================
 // ---------- Main game loop ----------
@@ -472,7 +477,7 @@ async function mainGameLoop() {
         }
 
         if (currentLocation === "village") {
-          if (playerChoiceNum < 1 || playerChoiceNum > 7) {
+          if (!isValidChoice(playerChoiceNum, 1, 7)) {
             throw "Please enter a number between 1 and 7.";
           }
           validChoice = true;
@@ -490,7 +495,7 @@ async function mainGameLoop() {
             console.log("\nThanks for playing!");
           }
         } else if (currentLocation === "blacksmith") {
-          if (playerChoiceNum < 1 || playerChoiceNum > 7) {
+          if (!isValidChoice(playerChoiceNum, 1, 7)) {
             throw "Please enter a number between 1 and 7.";
           }
 
@@ -513,7 +518,7 @@ async function mainGameLoop() {
             console.log("\nThanks for playing!");
           }
         } else if (currentLocation === "market") {
-          if (playerChoiceNum < 1 || playerChoiceNum > 6) {
+          if (!isValidChoice(playerChoiceNum, 1, 6)) {
             throw "Please enter a number between 1 and 6.";
           }
 
@@ -534,7 +539,7 @@ async function mainGameLoop() {
             console.log("\nThanks for playing!");
           }
         } else if (currentLocation === "forest") {
-          if (playerChoiceNum < 1 || playerChoiceNum > 5) {
+          if (!isValidChoice(playerChoiceNum, 1, 5)) {
             throw "Please enter a number between 1 and 5.";
           }
 
