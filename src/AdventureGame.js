@@ -303,7 +303,7 @@ function updateHealth(amount) {
   return playerHealth;
 }
 
-function useItem() {
+async function useItem() {
   if (inventory.length === 0) {
     console.log("\nYou have no items!");
     return false;
@@ -314,7 +314,7 @@ function useItem() {
     console.log(index + 1 + ". " + item.name);
   });
 
-  let choice = readline.question("Use which item? (number or 'cancel'): ");
+  let choice = await askQuestion("Use which item? (number or 'cancel'): ");
   if (choice === "cancel") return false;
 
   let index = parseInt(choice) - 1;
