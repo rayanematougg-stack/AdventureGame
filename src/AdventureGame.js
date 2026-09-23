@@ -36,7 +36,27 @@ const sword = {
   effect: 10,
   description: "A sturdy blade for combat ",
 };
-
+const steelSword = {
+  name: "Steel Sword",
+  type: "weapon",
+  value: 25,
+  effect: 20,
+  description: "A sharp, well-forged blade dealing heavy damage",
+};
+const shield = {
+  name: "Wooden Shield",
+  type: "armor",
+  value: 8,
+  effect: 5,
+  description: "Reduces damage taken in combat",
+};
+const ironShield = {
+  name: "Iron Shield",
+  type: "armor",
+  value: 20,
+  effect: 12,
+  description: "A sturdy shield offering strong protection",
+};
 //Create empty inventory array
 
 let inventory = []; //Will store all player items
@@ -62,7 +82,7 @@ function showStatus() {
     console.log("Nothing in inventory");
   } else {
     inventory.forEach((item, index) => {
-      console.log("" + (index + 1) + "." + item.Name);
+      console.log("" + (index + 1) + "." + item.name);
     });
   }
 }
@@ -147,12 +167,25 @@ function move(playerChoiceNum) {
       validMove = true;
     } else if (playerChoiceNum === 3) {
       currentLocation = "forest";
-      console.log("\nYou entered the forest...");
       validMove = true;
-      //Trigger combat when entering forest
-      console.log("\nA monster appears !");
-      if (!handlCombat()) {
-        currentLocation = "village";
+
+      if (hasGoodEquipment()) {
+        console.log("\nDeep in the forest, you sense a powerful presence...");
+        console.log("The dragon has emerged from its lair!");
+        if (!handlCombat(true)) {
+          currentLocation = "village";
+        } else {
+          gameRunning = false; // player won the game!
+          console.log(
+            "\n🏆 You have completed your quest! Thanks for playing!",
+          );
+        }
+      } else {
+        console.log("\nYou entered the forest...");
+        console.log("\nA monster appears!");
+        if (!handlCombat()) {
+          currentLocation = "village";
+        }
       }
     }
   } else if (currentLocation === "blacksmith") {
@@ -189,19 +222,90 @@ function hasItemType(type) {
  *checks if player has a weapon and manages combat results
  */
 
-function handlCombat() {
-  if (hasItemType("weapon")) {
-    let weapon = inventory.find((item) => item.type === "weapon");
-    console.log("You attack with your " + weapon.Name + "!");
-    console.log("You deal " + weapon.effect + "damage!");
-    console.log("victory! You found 10 gold !");
-    playerGold += 10;
-    return true;
+function handlCombat(isDragon = false) {
+  // Set monster stats based on battle type
+  let monsterDamage = isDragon ? 20 : 10;
+  let monsterHealth = isDragon ? 50 : 20;
+
+  if (isDragon) {
+    console.log("\n🐉 The DRAGON rises before you! This is the final battle!");
   } else {
+    console.log("\nA monster appears!");
+  }
+
+  // Automatically select best available equipment
+  let bestWeapon = getBestItem("weapon");
+  let bestArmor = getBestItem("armor");
+
+  if (bestWeapon) {
+    console.log(
+      "You ready your " +
+        bestWeapon.name +
+        " (damage: " +
+        bestWeapon.effect +
+        ")",
+    );
+  } else {
+    console.log("You have no weapon!");
+  }
+
+  if (bestArmor) {
+    console.log(
+      "You brace behind your " +
+        bestArmor.name +
+        " (protection: " +
+        bestArmor.effect +
+        ")",
+    );
+  } else {
+    console.log("You have no armor!");
+  }
+
+  // Dragon requires the best weapon and armor to have a real chance
+  if (
+    isDragon &&
+    (!bestWeapon || bestWeapon.name !== "Steel Sword" || !bestArmor)
+  ) {
+    console.log("\nYour equipment isn't strong enough to face the dragon!");
     console.log("Without a weapon, you must retreat!");
-    updateHealth(-20);
+    updateHealth(-monsterDamage);
     return false;
   }
+
+  if (!bestWeapon) {
+    console.log("Without a weapon, you must retreat!");
+    updateHealth(-monsterDamage);
+    return false;
+  }
+
+  // Calculate damage taken, reduced by armor
+  let armorReduction = bestArmor ? bestArmor.effect : 0;
+  let damageTaken = monsterDamage - armorReduction;
+  if (damageTaken < 1) {
+    damageTaken = 1; // minimum damage of 1
+  }
+
+  console.log("\nYou attack with your " + bestWeapon.name + "!");
+  console.log("You deal " + bestWeapon.effect + " damage!");
+
+  if (bestArmor) {
+    console.log(
+      "Your " + bestArmor.name + " absorbs " + armorReduction + " damage!",
+    );
+  }
+  console.log("You take " + damageTaken + " damage from the monster!");
+
+  updateHealth(-damageTaken);
+
+  if (isDragon) {
+    console.log("\n🎉 VICTORY! You have defeated the dragon!");
+    playerGold += 100;
+  } else {
+    console.log("\nVictory! You found 10 gold!");
+    playerGold += 10;
+  }
+
+  return true;
 }
 
 /**
@@ -274,7 +378,7 @@ function checkInventory() {
     return;
   }
   inventory.forEach((item, index) => {
-    console.log("" + (index + 1) + "" + item);
+    console.log("" + (index + 1) + "" + item.name);
   });
 }
 //========================
@@ -303,7 +407,7 @@ function buyFromMarket() {
   if (playerGold >= healthPotion.value) {
     console.log("\nMerchant : 'This portion will heal your wounds !'");
     playerGold -= healthPotion.value;
-    inventory.push("potion");
+    inventory.push({ ...healthPotion });
     console.log(
       "You bought a " +
         healthPotion.name +
@@ -350,6 +454,49 @@ function showHelp() {
   console.log("- Keep healing potions for dangerous areas");
   console.log("- Defeat monsters to earn gold");
   console.log("- Health can't go above 100");
+}
+
+// =========================================
+// Item Helper Functions (Task 1)
+// =========================================
+
+/**
+ * Returns all items in the inventory matching the given type
+ */
+function getItemsByType(type) {
+  return inventory.filter((item) => item.type === type);
+}
+
+/**
+ * Returns the item with the highest effect value for a given type
+ * Returns null if no items of that type are found
+ */
+function getBestItem(type) {
+  let items = getItemsByType(type);
+  if (items.length === 0) {
+    return null;
+  }
+
+  let best = items[0];
+  for (let i = 1; i < items.length; i++) {
+    if (items[i].effect > best.effect) {
+      best = items[i];
+    }
+  }
+  return best;
+}
+
+/**
+ * Checks if the player has strong enough equipment to face the dragon
+ * Requires the Steel Sword and at least some armor
+ */
+function hasGoodEquipment() {
+  let bestWeapon = getBestItem("weapon");
+  let hasArmorPiece = getItemsByType("armor").length > 0;
+
+  let hasSteelSword = bestWeapon !== null && bestWeapon.name === "Steel Sword";
+
+  return hasSteelSword && hasArmorPiece;
 }
 
 //====================================
@@ -451,21 +598,21 @@ while (gameRunning) {
           console.log("\nThanks for playing!");
         }
       } else if (currentLocation === "forest") {
-        if (choiceNum < 1 || choiceNum > 5) {
+        if (playerChoiceNum < 1 || playerChoiceNum > 5) {
           throw "Please enter a number between 1 and 5.";
         }
 
         validChoice = true;
 
-        if (choiceNum === 1) {
+        if (playerChoiceNum === 1) {
           move(choiceNum);
-        } else if (choiceNum === 2) {
+        } else if (playerChoiceNum === 2) {
           showStatus();
-        } else if (choiceNum === 3) {
+        } else if (playerChoiceNum === 3) {
           useItem();
-        } else if (choiceNum === 4) {
+        } else if (playerChoiceNum === 4) {
           showHelp();
-        } else if (choiceNum === 5) {
+        } else if (playerChoiceNum === 5) {
           gameRunning = false;
           console.log("\nThanks for playing!");
         }
