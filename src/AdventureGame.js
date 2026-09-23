@@ -164,7 +164,7 @@ function move(playerChoiceNum) {
       if (hasGoodEquipment()) {
         console.log("\nDeep in the forest, you sense a powerful presence...");
         console.log("The dragon has emerged from its lair!");
-        if (!handlCombat(true)) {
+        if (!handleCombat(true)) {
           currentLocation = "village";
         } else {
           gameRunning = false; // player won the game!
@@ -175,7 +175,7 @@ function move(playerChoiceNum) {
       } else {
         console.log("\nYou entered the forest...");
         console.log("\nA monster appears!");
-        if (!handlCombat(false)) {
+        if (!handleCombat(false)) {
           currentLocation = "village";
         }
       }
@@ -206,7 +206,7 @@ function hasItemType(type) {
   return inventory.some((item) => item.type === type);
 }
 
-function handlCombat(isDragon = false) {
+function handleCombat(isDragon = false) {
   let monsterDamage = isDragon ? 20 : 10;
   let monsterHealth = isDragon ? 50 : 20;
 
