@@ -482,7 +482,7 @@ async function mainGameLoop() {
           } else if (playerChoiceNum === 4) {
             showStatus();
           } else if (playerChoiceNum === 5) {
-            useItem();
+            await useItem();
           } else if (playerChoiceNum === 6) {
             showHelp();
           } else if (playerChoiceNum === 7) {
@@ -505,7 +505,7 @@ async function mainGameLoop() {
           } else if (playerChoiceNum === 4) {
             showStatus();
           } else if (playerChoiceNum === 5) {
-            useItem();
+            await useItem();
           } else if (playerChoiceNum === 6) {
             showHelp();
           } else if (playerChoiceNum === 7) {
@@ -526,7 +526,7 @@ async function mainGameLoop() {
           } else if (playerChoiceNum === 3) {
             showStatus();
           } else if (playerChoiceNum === 4) {
-            useItem();
+            await useItem();
           } else if (playerChoiceNum === 5) {
             showHelp();
           } else if (playerChoiceNum === 6) {
@@ -545,7 +545,7 @@ async function mainGameLoop() {
           } else if (playerChoiceNum === 2) {
             showStatus();
           } else if (playerChoiceNum === 3) {
-            useItem();
+            await useItem();
           } else if (playerChoiceNum === 4) {
             showHelp();
           } else if (playerChoiceNum === 5) {
